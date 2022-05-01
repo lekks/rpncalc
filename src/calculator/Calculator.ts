@@ -1,6 +1,6 @@
 import {BS_SYMBOL, CLEAR_SYMBOL, Editor} from "./Editor";
 import {Expression, NumberExpression} from "./Expression";
-import ops from "./operations";
+import ops from "./Operations";
 import {BehaviorSubject, combineLatest, Observable, Observer, Subject, Subscription} from "rxjs"
 import {distinctUntilChanged, map} from "rxjs/operators";
 import {Stack} from "./Stack";

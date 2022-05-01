@@ -1,4 +1,4 @@
-import ops from "../calculator/operations";
+import ops from "../calculator/Operations";
 import {Expression, NumberExpression} from "../calculator/Expression";
 
 function buildTestExpr4(a: number | string, op1: string, b: number | string, op3: string, c: number | string, op2: string, d: number | string): Expression {
