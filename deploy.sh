@@ -4,7 +4,7 @@ set -e
 set -x
 
 rm -rf build
-npm run build
+bash scripts/npm.sh run build
 (cd gh-pages; git checkout gh-pages;)
 find gh-pages -maxdepth 1 -type f -delete
 rm -rf gh-pages/static

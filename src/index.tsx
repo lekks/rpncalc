@@ -1,14 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import './index.css';
 import App, {registerClipboardSupport} from './components/App';
 import * as serviceWorker from './serviceWorker';
 
 registerClipboardSupport();
-ReactDOM.render(<App/>, document.getElementById('root'));
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-// serviceWorker.unregister();
-serviceWorker.register();
+const container = document.getElementById('root');
+if (!container) {
+    throw new Error('Root element is missing');
+}
+createRoot(container).render(<App/>);
+serviceWorker.unregister();
