@@ -37,8 +37,8 @@ export interface CalculatorSignals {
 
 export class Calculator {
 
-    private readonly calcResult = new Subject<StackItem | undefined>();
-    private readonly expressionStack = new Subject<StackItem[]>();
+    private readonly calcResult = new BehaviorSubject<StackItem | undefined>(undefined);
+    private readonly expressionStack = new BehaviorSubject<StackItem[]>([]);
     private readonly stack = new Stack();
     private readonly editorText = new BehaviorSubject<string>("")
     private readonly editorValue = new BehaviorSubject<number>(NaN)
@@ -55,9 +55,6 @@ export class Calculator {
             inputString: this.editorInputString,
             outputValue: this.editorValue
         });
-
-        this.subscriptions.add(extern.inputEvent?.subscribe(this.processInputEvent.bind(this)))
-        this.subscriptions.add(extern.editorTextInput?.subscribe(this.editorInputString))
 
         this.subscriptions.add(this.stack.getExpressionsObservable().pipe(
             map((exprStack: Expression[]): StackItem[] => exprStack.map((expr: Expression): StackItem => {
@@ -83,6 +80,9 @@ export class Calculator {
         this.subscriptions.add(this.expressionStack.subscribe(extern.expressionStack))
         this.subscriptions.add(this.calcResult.subscribe(extern.stackResult))
         this.subscriptions.add(this.editorText.subscribe(extern.editorText))
+
+        this.subscriptions.add(extern.inputEvent?.subscribe(this.processInputEvent.bind(this)))
+        this.subscriptions.add(extern.editorTextInput?.subscribe(this.editorInputString))
     }
 
     public destroy() {

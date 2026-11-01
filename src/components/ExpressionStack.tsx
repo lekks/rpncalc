@@ -11,13 +11,16 @@ interface Props {
     exprStack: Observable<StackItem[]>;
 }
 
-class ExpressionStack extends React.Component<any, State> {
+class ExpressionStack extends React.Component<Props, State> {
     private readonly subscription = new Subscription();
 
     constructor(props: Props) {
         super(props,);
         this.state = {expressions: []};
-        this.subscription.add(props.exprStack.subscribe((expressions) => {
+    }
+
+    public componentDidMount() {
+        this.subscription.add(this.props.exprStack.subscribe((expressions) => {
             this.setState({expressions})
         }))
     }

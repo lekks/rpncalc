@@ -22,6 +22,17 @@ describe('Test Calculator', () => {
         calculator.destroy()
     })
 
+    test('result follows editor input before the first stack change', () => {
+        calcInputEvent.next({type: CalcInputType.ADD_NUMBER, payload: '2'});
+        expect(clipboardOutput.getValue()).toBe(2);
+
+        calcInputEvent.next({type: CalcInputType.ADD_NUMBER, payload: '3'});
+        expect(clipboardOutput.getValue()).toBe(23);
+
+        calcInputEvent.next({type: CalcInputType.DEL});
+        expect(clipboardOutput.getValue()).toBeNaN();
+    });
+
     test('2х3=6', () => {
         from([
                 {type: CalcInputType.ADD_NUMBER, payload: '2'},

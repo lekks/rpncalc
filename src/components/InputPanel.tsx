@@ -10,16 +10,18 @@ interface Props {
     text: Observable<string>;
 }
 
-class InputPanel extends React.Component<any, State> {
+class InputPanel extends React.Component<Props, State> {
     private readonly subscription = new Subscription();
 
     constructor(props: Props) {
         super(props,);
         this.state = {text: ""};
-        this.subscription.add(props.text.subscribe((text) => {
+    }
+
+    public componentDidMount() {
+        this.subscription.add(this.props.text.subscribe((text) => {
             this.setState({text})
         }))
-
     }
 
     public componentWillUnmount() {

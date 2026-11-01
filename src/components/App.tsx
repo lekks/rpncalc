@@ -10,9 +10,10 @@ const CLIPBOARD_ROUND = 8;
 
 const calcInputEvent = new Subject<CalcInputEvent>();
 const calcEditorStringInput = new Subject<string>();
-const calcEditorStringOutput = new Subject<string>();
+// Commands are events; outputs retain the current state for new subscribers.
+const calcEditorStringOutput = new BehaviorSubject<string>("");
 const calcResult = new BehaviorSubject<number>(NaN);
-const calcExpressionStack = new Subject<StackItem[]>()
+const calcExpressionStack = new BehaviorSubject<StackItem[]>([])
 
 new Calculator({
     inputEvent: calcInputEvent,

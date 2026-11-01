@@ -1,8 +1,8 @@
-import {Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {Expression} from "./Expression";
 
 export class Stack {
-    private readonly expressionStack = new Subject<Expression[]>();
+    private readonly expressionStack = new BehaviorSubject<Expression[]>([]);
     private stack: Expression[] = [];
     private history: Expression[][] = [];
 

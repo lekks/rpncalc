@@ -47,4 +47,22 @@ describe('App', () => {
         }
         expect(div.querySelector('annotation')?.textContent).toBe('4\\times5=20');
     });
+
+    it('restores current editor text and stack when the UI reconnects', async () => {
+        for (const key of ['2', 'Enter', '3']) {
+            await press(key);
+        }
+
+        await act(async () => root.unmount());
+        root = createRoot(div);
+        await act(async () => root.render(<App/>));
+
+        expect(div.querySelector('.Input')?.textContent).toBe('3');
+        expect(div.querySelector('annotation')?.textContent).toBe('2=2');
+
+        // Reconnecting displays state without replaying earlier commands.
+        await press('+');
+        expect(div.querySelectorAll('.Expression')).toHaveLength(1);
+        expect(div.querySelector('annotation')?.textContent).toBe('2+3=5');
+    });
 });
