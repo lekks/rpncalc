@@ -1,8 +1,8 @@
 import {BS_SYMBOL, CLEAR_SYMBOL, Editor} from "./Editor";
 import {Expression, NumberExpression} from "./Expression";
 import ops from "./Operations";
-import {BehaviorSubject, combineLatest, Observable, Observer, Subject, Subscription} from "rxjs"
-import {distinctUntilChanged, map} from "rxjs/operators";
+import {BehaviorSubject, EMPTY, merge, Observable, Observer, queueScheduler, Subject, Subscription} from "rxjs"
+import {distinctUntilChanged, map, observeOn} from "rxjs/operators";
 import {Stack} from "./Stack";
 
 
@@ -26,6 +26,13 @@ export interface StackItem {
     readonly result: number
 }
 
+export interface CalculatorState {
+    readonly editorText: string;
+    readonly expressionStack: StackItem[];
+    readonly stackResult: StackItem | undefined;
+    readonly result: number;
+}
+
 export interface CalculatorSignals {
     inputEvent?: Observable<CalcInputEvent>,
     editorTextInput?: Observable<string>,
@@ -37,7 +44,14 @@ export interface CalculatorSignals {
 
 export class Calculator {
 
-    private readonly calcResult = new BehaviorSubject<StackItem | undefined>(undefined);
+    private readonly state = new BehaviorSubject<CalculatorState>({
+        editorText: "",
+        expressionStack: [],
+        stackResult: undefined,
+        result: NaN
+    });
+    public readonly state$ = this.state.asObservable();
+
     private readonly expressionStack = new BehaviorSubject<StackItem[]>([]);
     private readonly stack = new Stack();
     private readonly editorText = new BehaviorSubject<string>("")
@@ -65,29 +79,56 @@ export class Calculator {
             }))
         ).subscribe(this.expressionStack))
 
-        this.subscriptions.add(this.expressionStack.pipe(
-            map((stack: StackItem[]) =>
-                stack[stack.length - 1] ? stack[stack.length - 1] : undefined
-            )
-        ).subscribe(this.calcResult))
+        this.publishState();
 
-        this.subscriptions.add(combineLatest([this.editorValue, this.calcResult]).pipe(
-            map(([editor, stack]) => {
-                return !isNaN(editor) ? editor : (stack ? stack.result : NaN)
-            }),
-            distinctUntilChanged()
+        this.subscriptions.add(this.state$.pipe(
+            map(state => state.result),
+            distinctUntilChanged(Object.is)
         ).subscribe(extern.result))
-        this.subscriptions.add(this.expressionStack.subscribe(extern.expressionStack))
-        this.subscriptions.add(this.calcResult.subscribe(extern.stackResult))
-        this.subscriptions.add(this.editorText.subscribe(extern.editorText))
+        this.subscriptions.add(this.state$.pipe(
+            map(state => state.expressionStack),
+            distinctUntilChanged()
+        ).subscribe(extern.expressionStack))
+        this.subscriptions.add(this.state$.pipe(
+            map(state => state.stackResult),
+            distinctUntilChanged()
+        ).subscribe(extern.stackResult))
+        this.subscriptions.add(this.state$.pipe(
+            map(state => state.editorText),
+            distinctUntilChanged()
+        ).subscribe(extern.editorText))
 
-        this.subscriptions.add(extern.inputEvent?.subscribe(this.processInputEvent.bind(this)))
-        this.subscriptions.add(extern.editorTextInput?.subscribe(this.editorInputString))
+        // A command (including a pasted string) finishes before its state is published.
+        // Reentrant commands wait until every subscriber receives the current state.
+        this.subscriptions.add(merge(
+            extern.inputEvent?.pipe(map(event => ({kind: "command" as const, event}))) ?? EMPTY,
+            extern.editorTextInput?.pipe(map(text => ({kind: "text" as const, text}))) ?? EMPTY
+        ).pipe(observeOn(queueScheduler)).subscribe(input => {
+            if (input.kind === "command") {
+                this.processInputEvent(input.event);
+            } else {
+                this.editorInputString.next(input.text);
+            }
+            this.publishState();
+        }))
     }
 
     public destroy() {
         this.editor.destroy()
         this.subscriptions.unsubscribe()
+        this.state.complete()
+    }
+
+    private publishState() {
+        const expressionStack = this.expressionStack.getValue();
+        const stackResult = expressionStack[expressionStack.length - 1];
+        const editorValue = this.editorValue.getValue();
+        this.state.next({
+            editorText: this.editorText.getValue(),
+            expressionStack,
+            stackResult,
+            result: !isNaN(editorValue) ? editorValue : (stackResult ? stackResult.result : NaN)
+        });
     }
 
     private editorExpression(): Expression {
