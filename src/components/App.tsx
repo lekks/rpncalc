@@ -98,7 +98,7 @@ const App: React.FC = () => {
                                                         action={CalcInputType.ADD_NUMBER}
                                                         subject={calcInputEvent}/>
                         </td>
-                        <td className="Num"><CalcButton caption="." tag="." keybinding="."
+                        <td className="Num"><CalcButton caption="." tag="." keybinding="." alternateKeys={[","]} keyCode="NumpadDecimal"
                                                         action={CalcInputType.ADD_NUMBER}
                                                         subject={calcInputEvent}/>
                         </td>

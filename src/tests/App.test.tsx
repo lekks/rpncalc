@@ -48,6 +48,20 @@ describe('App', () => {
         expect(div.querySelector('annotation')?.textContent).toBe('4\\times5=20');
     });
 
+    it('accepts decimal separators from both keyboard layouts without duplicating the separator', async () => {
+        await press('1');
+        await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', {key: ',', code: 'NumpadDecimal'})));
+        await press('5');
+        await press('.');
+        expect(div.querySelector('.Input')?.textContent).toBe('1.5');
+    });
+
+    it('keeps numpad Delete working when Num Lock is off', async () => {
+        await press('1');
+        await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Delete', code: 'NumpadDecimal'})));
+        expect(div.querySelector('.Input')?.textContent).toBe('');
+    });
+
     it('restores current editor text and stack when the UI reconnects', async () => {
         for (const key of ['2', 'Enter', '3']) {
             await press(key);

@@ -8,6 +8,8 @@ interface Props {
     tag?: string;
     action: CalcInputType;
     keybinding?: string;
+    alternateKeys?: string[];
+    keyCode?: string;
     subject: Observer<CalcInputEvent>;
 }
 
@@ -34,7 +36,8 @@ class CalcButton extends React.Component<Props, any> {
     };
 
     private onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === this.props.keybinding) {
+        if (e.key === this.props.keybinding || this.props.alternateKeys?.includes(e.key) ||
+            (this.props.keyCode === e.code && e.key !== 'Delete' && e.key !== 'Clear')) {
             this.onClick()
         }
         // console.log(e)
