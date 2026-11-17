@@ -7,15 +7,18 @@ body, html, #root {
     height: 100%
 }
 
+#root {
+    display: flow-root;
+}
+
 .App {
     background-color: #292929;
 
     width: 100%;
     max-width: 600px;
 
-    height: 100%;
-    min-height: min-content;
-    max-height: 700px;
+    height: 100vh;
+    height: 100dvh;
 
     margin-left: auto;
     margin-right: auto;
@@ -27,7 +30,8 @@ body, html, #root {
 
 @media screen and (min-height: 800px) {
     .App {
-        margin-top: 5%;
+        height: 90dvh;
+        margin-top: 5dvh;
     }
 }
 
@@ -35,7 +39,8 @@ body, html, #root {
     color: white;
     padding-left: 5px;
     padding-right: 5px;
-    height: 100%;
+    flex: 1 1 0;
+    min-height: 0;
     overflow: auto;
     display: flex;
     flex-direction: column-reverse;
@@ -54,12 +59,17 @@ hr {
 }
 
 .Input {
+    flex: 0 0 auto;
     background-color: #2B2B2B;
     color: #E1E1E1;
     min-height: 30px;
     padding: 8px 8px 8px 18px;
     font-size: 28px;
     line-height: 30px;
+}
+
+.Pad {
+    flex: 0 0 auto;
 }
 
 .Buttons {
