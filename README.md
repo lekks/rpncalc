@@ -1,6 +1,6 @@
 Simple browser calculator with [Reverse Polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation).
 
-Link: [rpn.app](https://rpn.app)
+Link: [rpn.projlet.com](https://rpn.projlet.com)
 
 <img width="746" height="712" alt="image" src="https://github.com/user-attachments/assets/0e0c3d2b-43a0-4fc6-922c-d67338f21699" />
 
@@ -54,3 +54,20 @@ PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome bash scripts/npm.sh r
 
 CI installs dependencies with `npm ci`, runs the unit tests, builds the app,
 and checks calculator controls, expressions and clipboard events in Chromium.
+
+## Deployment
+
+The site is hosted on GitHub Pages at [rpn.projlet.com](https://rpn.projlet.com)
+and deploys automatically: every push to `develop` runs the CI checks and then
+publishes `build/` via the `deploy` job in `.github/workflows/ci.yml`
+(Actions-based Pages, no `gh-pages` branch or local deploy script needed).
+The custom domain is set in `public/CNAME`, which Vite copies into the build.
+
+DNS at the domain registrar:
+
+| Record | Name | Value |
+| ------ | ---- | ----- |
+| CNAME | `rpn` | `lekks.github.io` |
+| CNAME | `www.rpn` | `lekks.github.io` |
+
+GitHub issues the HTTPS certificate automatically once DNS resolves.
