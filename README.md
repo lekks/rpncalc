@@ -63,11 +63,12 @@ publishes `build/` via the `deploy` job in `.github/workflows/ci.yml`
 (Actions-based Pages, no `gh-pages` branch or local deploy script needed).
 The custom domain is set in `public/CNAME`, which Vite copies into the build.
 
-DNS at the domain registrar:
+DNS is managed at Dynadot (My Domains → Manage Domains → DNS Settings →
+Dynadot DNS), under "Subdomain Records":
 
-| Record | Name | Value |
-| ------ | ---- | ----- |
-| CNAME | `rpn` | `lekks.github.io` |
-| CNAME | `www.rpn` | `lekks.github.io` |
+| Subdomain | Type | Value |
+| --------- | ---- | ----- |
+| `rpn` | CNAME | `lekks.github.io` |
+| `calc` | Forward (301) | `https://rpn.projlet.com` |
 
 GitHub issues the HTTPS certificate automatically once DNS resolves.
